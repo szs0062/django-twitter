@@ -85,7 +85,7 @@ class AccountApiTests(TestCase):
             'password': 'any password',
         }
         # 测试 get 请求失败
-        response = self.client.get(SIGNUP_URL, data)
+        response = self.client.get(SIGNUP_URL, data) 
         self.assertEqual(response.status_code, 405)
 
         # 测试错误的邮箱
