@@ -5,7 +5,7 @@ from utils.time_helpers import utc_now
 
 
 # Create your models here.
-class FriendShip(models.Model):
+class Friendship(models.Model):
     from_user = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -30,3 +30,4 @@ class FriendShip(models.Model):
 
     def __str__(self):
         return '{} followed {}'.format(self.from_user_id, self.to_user_id)
+
