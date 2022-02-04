@@ -16,7 +16,6 @@ import sys
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -27,7 +26,6 @@ SECRET_KEY = '61a9xuw+y#4a*y_2a3pd#(fq(g6upvmo(i21!yxr&@+-@@c!ts'
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', '192.168.33.10', 'localhost']
-
 
 # Application definition
 
@@ -94,7 +92,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'twitter.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -108,7 +105,6 @@ DATABASES = {
         'PASSWORD': 'yourpassword',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -128,7 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -141,7 +136,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
@@ -156,7 +150,6 @@ try:
     from .local_settings import *
 except:
     pass
-
 
 # 设置存储用户上传文件的 storage 用什么系统
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
@@ -186,10 +179,17 @@ CACHES = {
     },
 }
 
+# Redis
+# 安装方法：sudo apt-get install redis
+# 然后安装redis的python客户端： pip install redis
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
+REDIS_DB = 0 if TESTING else 1
+REDIS_KEY_EXPIRE_TIME = 7 * 86400  # in seconds
+
 # 你还需要在 local_settings.py 中设置你的 AWS_ACCESS_KEY_ID 和 AWS_SECRET_ACCESS_KEY
 # 因为这是比较机密的信息，是不适合放在 settings.py 这种共享的配置文件中共享给所有开发者的
 # 真实的开发场景下，可以使用 local_settings.py 的方式，或者设置在环境变量里的方式
 # 这样这些机密信息就可以只被负责运维的核心开发人员掌控，而非所有开发者，降低泄露风险
 # AWS_ACCESS_KEY_ID = 'YOUR_ACCESS_KEY_ID'
 # AWS_SECRET_ACCESS_KEY = 'YOUR_SECRET_ACCESS_KEY'
-
