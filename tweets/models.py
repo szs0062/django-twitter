@@ -2,8 +2,10 @@ from accounts.services import UserService
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.signals import post_save, pre_delete
 from likes.models import Like
 from tweets.constants import *
+from tweets.listeners import push_tweet_to_cache
 from utils.time_helpers import utc_now
 
 
@@ -76,59 +78,4 @@ class TweetPhoto(models.Model):
         return f'{self.tweet_id}: {self.file}'
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+post_save.connect(push_tweet_to_cache, sender=Tweet)
