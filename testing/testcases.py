@@ -8,6 +8,7 @@ from newsfeeds.models import NewsFeed
 from rest_framework.test import APIClient
 from tweets.models import Tweet
 from utils.redis_client import RedisClient
+from friendships.models import Friendship
 
 
 class TestCase(DjangoTestCase):
@@ -56,3 +57,6 @@ class TestCase(DjangoTestCase):
 
     def create_newsfeed(self, user, tweet):
         return NewsFeed.objects.create(user=user, tweet=tweet)
+
+    def create_friendship(self, from_user, to_user):
+        Friendship.objects.create(from_user=from_user, to_user=to_user)
