@@ -3,12 +3,12 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 from testing.testcases import TestCase
 
-
 COMMENT_URL = '/api/comments/'
 COMMENT_DETAIL_URl = '/api/comments/{}/'
 TWEET_LIST_API = '/api/tweets/'
 TWEET_DETAIL_API = '/api/tweets/{}/'
 NEWSFEED_LIST_API = '/api/newsfeeds/'
+LIKE_BASE_URL = '/api/likes/'
 
 
 class CommentApiTests(TestCase):
@@ -160,3 +160,21 @@ class CommentApiTests(TestCase):
         response = self.dongxie_client.get(NEWSFEED_LIST_API)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'][0]['tweet']['comments_count'], 2)
+
+    def test_likes_count(self):
+        comment = self.create_comment(self.linghu, self.tweet, 'original')
+        data = {'content_type': 'comment', 'object_id': comment.id}
+        self.linghu_client.post(LIKE_BASE_URL, data)
+
+        comment_url = COMMENT_DETAIL_URl.format(comment.id)
+        response = self.linghu_client.get(comment_url)
+        self.assertEqual(response.data['likes_count'], 1)
+        comment.refresh_from_db()
+        self.assertEqual(comment.likes_count, 1)
+
+        # dongxie canceled likes
+        self.linghu_client.post(LIKE_BASE_URL + 'cancel/', data)
+        comment.refresh_from_db()
+        self.assertEqual(comment.likes_count, 0)
+        response = self.dongxie_client.get(comment_url)
+        self.assertEqual(response.data['likes_count'], 0)

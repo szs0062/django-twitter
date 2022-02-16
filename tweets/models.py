@@ -15,6 +15,11 @@ class Tweet(models.Model):
     content = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # 新增的field一定要设置 null=True， 否则default = 0会遍历整个表单去设置
+    # 导致Migration过程非常慢，从而把整张表单锁死，从而正常用户无法创建新的tweets
+    likes_count = models.IntegerField(default=0, null=True)
+    comments_count = models.IntegerField(default=0, null=True)
+
     class Meta:
         index_together = (('user', 'created_at'),)
         ordering = ('user', '-created_at')
