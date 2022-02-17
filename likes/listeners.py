@@ -11,8 +11,9 @@ def incr_likes_count(sender, instance, created, **kwargs):
 
     model_class = instance.content_type.model_class()
     if model_class != Tweet:
+        Comment.objects.filter(id=instance.object_id).update(likes_count=F('likes_count') + 1)
         comment = instance.content_object
-        Comment.objects.filter(id=comment.id).update(likes_count=F('likes_count') + 1)
+        RedisHelper.incr_count(comment, 'likes_count')
         return
 
     # 不可以使用tweet.likes_count += 1; tweet.save()的方式
@@ -29,8 +30,9 @@ def decr_likes_count(sender, instance, **kwargs):
 
     model_class = instance.content_type.model_class()
     if model_class != Tweet:
+        Comment.objects.filter(id=instance.object_id).update(likes_count=F('likes_count') - 1)
         comment = instance.content_object
-        Comment.objects.filter(id=comment.id).update(likes_count=F('likes_count') - 1)
+        RedisHelper.decr_count(comment, 'likes_count')
         return
 
     # handle tweet likes cancel
