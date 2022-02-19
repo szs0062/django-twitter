@@ -194,3 +194,13 @@ REDIS_LIST_LENGTH_LIMIT = 200 if not TESTING else 20
 # 这样这些机密信息就可以只被负责运维的核心开发人员掌控，而非所有开发者，降低泄露风险
 # AWS_ACCESS_KEY_ID = 'YOUR_ACCESS_KEY_ID'
 # AWS_SECRET_ACCESS_KEY = 'YOUR_SECRET_ACCESS_KEY'
+
+# Celery Configuration Options
+# 使用如下命令把worker进程（只执行异步任务的进程，可以在不同多的机器上跑起来）单独跑起来
+# celery -A twitter worker -l INFO
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2' if not TESTING else 'redis://127.0.0.1:6379/0'
+CELERY_TIMEZONE = "UTC"
+CELERY_TASK_ALWAYS_EAGER = TESTING
+
+
+
