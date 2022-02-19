@@ -19,12 +19,10 @@ def fanout_newsfeeds_batch_task(tweet_id, follower_ids):
     #         tweet=tweet,
     #     )
     # 正确的方法：使用 bulk_create，会把 insert 语句合成一条
-    tweet = Tweet.objects.get(id=tweet_id)
     newsfeeds = [
         NewsFeed(user_id=follower_id, tweet_id=tweet_id)
         for follower_id in follower_ids
     ]
-    newsfeeds.append(NewsFeed(user=tweet.user, tweet=tweet))
     NewsFeed.objects.bulk_create(newsfeeds)
 
     # bulk create 不会触发 post_save 的 signal，所以需要手动 push 到 cache 里
