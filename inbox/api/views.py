@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from notifications.models import Notification
 from utils.decorators import required_params
+from django.utils.decorators import method_decorator
+from ratelimit.decorators import ratelimit
 
 
 class NotificationViewSet(
@@ -16,18 +18,20 @@ class NotificationViewSet(
 ):
     serializer_class = NotificationSerializer
     permission_classes = (IsAuthenticated,)
-    filterset_fields = ('unread', )
+    filterset_fields = ('unread',)
 
     def get_queryset(self):
         return Notification.objects.filter(recipient=self.request.user)
 
     @action(methods=['GET'], detail=False, url_path='unread-count')
+    @method_decorator(ratelimit(key='user', rate='3/s', method='GET', block=True))
     def unread_count(self, request, *args, **kwargs):
         # /api/notifications/unread-count/
         count = self.get_queryset().filter(unread=True).count()
         return Response({'unread_count': count}, status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False, url_path='mark-all-as-read')
+    @method_decorator(ratelimit(key='user', rate='3/s', method='POST', block=True))
     def mark_all_as_read(self, request, *args, **kwargs):
         updated_count = self.get_queryset().filter(unread=True).update(unread=False)
         return Response(
@@ -36,6 +40,7 @@ class NotificationViewSet(
         )
 
     @required_params(method='PUT', params=['unread'])
+    @method_decorator(ratelimit(key='user', rate='3/s', method='POST', block=True))
     def update(self, request, *args, **kwargs):
         """
         用户可以标记一个 notification 为已读或者未读。标记已读和未读都是对 notification
