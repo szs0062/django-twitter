@@ -64,6 +64,22 @@ class EndlessPagination(BasePagination):
         self.has_next_page = len(queryset) > self.page_size
         return queryset[:self.page_size]
 
+    def paginate_hbase(self, hb_model, row_key_prefix, request):
+        if 'created_at__gt' in request.query_params:
+            # created_at__gt 用于下拉刷新的时候加载最新的内容进来
+            # 为了简便起见，下拉刷新不做翻页机制，直接加载所有更新的数据
+            # 因为如果数据很久没有更新的话，不会采用下拉刷新的方式进行更新，而是重新加载最新的数据
+            created_at__gt = request.query_params['created_at__gt']
+            start = (*row_key_prefix, created_at__gt)
+            stop = (*row_key_prefix, MAX_TIMESTAMP)
+            objects = hb_model.filter(start=start, stop=stop)
+            if len(objects) and objects[0].created_at == int(created_at__gt):
+                objects = objects[:0:-1]
+            else:
+                objects = objects[::-1]
+            self.has_next_page = False
+            return objects
+
     def paginate_cached_list(self, cached_list, request):
         paginated_list = self.paginate_ordered_list(cached_list, request)
         # 如果是向上翻页，paginated_list里是所有的最新数据，直接返回
