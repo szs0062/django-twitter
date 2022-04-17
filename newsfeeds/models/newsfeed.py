@@ -1,3 +1,8 @@
+"""
+Deprecated
+use newsfeeds.hbase_models.HBaseNewsFeed instead
+"""
+
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User

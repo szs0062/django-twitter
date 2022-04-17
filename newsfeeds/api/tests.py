@@ -5,7 +5,6 @@ from rest_framework.test import APIClient
 from testing.testcases import TestCase
 from utils.paginations import EndlessPagination
 
-
 NEWSFEEDS_URL = '/api/newsfeeds/'
 POST_TWEETS_URL = '/api/tweets/'
 FOLLOW_URL = '/api/friendships/{}/follow/'

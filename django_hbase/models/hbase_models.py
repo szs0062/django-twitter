@@ -1,7 +1,7 @@
-from .exceptions import EmptyColumnError, BadRowKeyError
 from django.conf import settings
 from django_hbase.client import HBaseClient
 from django_hbase.models import HBaseField, IntegerField, TimestampField
+from django_hbase.models.exceptions import EmptyColumnError, BadRowKeyError
 
 
 # sudo. / bin / start - hbase.sh
@@ -121,19 +121,22 @@ class HBaseModel:
     # instance.save()
     # instance.from_user_id = 2
     # instance.save()
-    def save(self):
+    def save(self, batch=None):
         row_data = self.serialize_row_data(self.__dict__)
         # 如果 row_data 为空，即没有任何column key values 需要存储hbase会直接不存储
         # 这个 row_key， 因此我们可以raise一个exception 提醒调用者，避免存储空置
         if len(row_data) == 0:
             raise EmptyColumnError()
-        table = self.get_table()
-        table.put(self.row_key, row_data)
+        if batch:
+            batch.put(self.row_key, row_data)
+        else:
+            table = self.get_table()
+            table.put(self.row_key, row_data)
 
     @classmethod
-    def create(cls, **kwargs):
+    def create(cls, batch=None, **kwargs):
         instance = cls(**kwargs)
-        instance.save()
+        instance.save(batch=batch)
         return instance
 
     @classmethod
@@ -154,6 +157,16 @@ class HBaseModel:
             key = column_key[column_key.find(':') + 1:]
             data[key] = cls.deserialize_field(key, column_value)
         return cls(**data)
+
+    @classmethod
+    def batch_create(cls, batch_data):
+        table = cls.get_table()
+        batch = table.batch()
+        results = []
+        for data in batch_data:
+            results.append(cls.create(batch=batch, **data))
+        batch.send()
+        return results
 
     @classmethod
     def get_table_name(cls):

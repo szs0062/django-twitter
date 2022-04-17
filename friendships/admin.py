@@ -1,5 +1,5 @@
 from django.contrib import admin
-from friendships.models import Friendship
+from friendships.models.friendship import Friendship
 
 
 # Register your models here.
