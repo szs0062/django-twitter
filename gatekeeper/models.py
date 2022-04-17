@@ -4,6 +4,10 @@ from utils.redis_client import RedisClient
 class GateKeeper(object):
 
     @classmethod
+    def turn_on(cls, gk_name):
+        cls.set_kv(gk_name, 'percent', 100)
+
+    @classmethod
     def get(cls, gk_name):
         conn = RedisClient.get_connection()
         name = f'gatekeeper:{gk_name}'
